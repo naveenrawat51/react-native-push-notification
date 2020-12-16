@@ -1,7 +1,8 @@
-import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, Button, Text, View } from "react-native";
+
 import * as Notifications from "expo-notifications";
+import * as Permissions from "expo-permissions";
 
 export default function App() {
   const triggerNotificationHandler = () => {
@@ -16,6 +17,21 @@ export default function App() {
       },
     });
   };
+
+  useEffect(() => {
+    Permissions.getAsync(Permissions.NOTIFICATIONS)
+      .then((statusObj) => {
+        if (statusObj.status !== "granted") {
+          return Permissions.askAsync(Permissions.NOTIFICATIONS);
+        }
+        return statusObj;
+      })
+      .then((statusObj) => {
+        if (statusObj.status !== "granted") {
+          return;
+        }
+      });
+  }, []);
   return (
     <View style={styles.container}>
       <Button
