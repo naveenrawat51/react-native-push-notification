@@ -4,6 +4,13 @@ import { StyleSheet, Button, Text, View } from "react-native";
 import * as Notifications from "expo-notifications";
 import * as Permissions from "expo-permissions";
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+  }),
+});
+
 export default function App() {
   const triggerNotificationHandler = () => {
     Notifications.scheduleNotificationAsync({
@@ -32,6 +39,26 @@ export default function App() {
         }
       });
   }, []);
+
+  useEffect(() => {
+    const backgroundSubscription = Notifications.addNotificationResponseReceivedListener(
+      (response) => {
+        console.log(response);
+      }
+    );
+
+    const foregroundSubscription = Notifications.addNotificationReceivedListener(
+      (notification) => {
+        console.log(notification);
+      }
+    );
+
+    return () => {
+      foregroundSubscription.remove();
+      backgroundSubscription.remove();
+    };
+  }, []);
+
   return (
     <View style={styles.container}>
       <Button
